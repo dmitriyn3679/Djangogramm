@@ -1,0 +1,173 @@
+{% load static %}
+{% for post in posts %}
+<div class="card my-4">
+    <div class="card-header">
+        <div class="row justify-content-start">
+            <div class="col-1 p-0 ps-3">
+                <a href="#">
+                        {% if post.post.avatar %}
+                            <img src="/mediafiles/{{ post.post.avatar }}" alt="mdo" width="40" height="40" class="rounded-circle mt-1">
+                        {% else %}
+                            <img src="{% static 'avatar.png' %}" alt="mdo" width="40" height="40" class="rounded-circle mt-1">
+                        {% endif %}
+                </a>
+            </div>
+            <div class="col-10 p-0 ps-3">
+                <a href="{% url 'web:profile' username=post.post.username %}"><h5 class="card-title p-0 m-0 pt-2">{{ post.post.username }}</h5></a>
+                <small class="card-subtitle m-0 p-0 text-muted">no location</small>
+            </div>
+            <div class="col-1 p-3">
+                <a href=#3" class="text-decoration-none icon">
+                    <i class="bi bi-three-dots fs-4"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+        <div id="post_{{ post.post.id }}" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false">
+            <div class="carousel-indicators">
+             {% for media in post.media %}
+                <button type="button" data-bs-target="#post_{{ post.post.id }}" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+            {% endfor %}
+            </div>
+          <div class="carousel-inner">
+              {% for media in post.media %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                  <img src="/mediafiles/{{ media.media }} " class="d-block w-100" alt="...">
+                </div>
+              {% endfor %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#post_{{ post.post.id }}" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#post_{{ post.post.id }}" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+
+    <div class="card-body">
+        <p class="m-0">
+            <a href="" class="text-decoration-none px-2 icon like-button" data-post="{{ post.post.id }}">
+                <i class="bi bi-heart fs-3"></i>
+            </a>
+            <a href="#" class="text-decoration-none px-2 icon">
+                <i class="bi bi-chat fs-3"></i>
+            </a>
+
+            <a href="#" class="text-decoration-none px-2 icon">
+                <i class="bi bi-send fs-3"></i>
+            </a>
+
+            <a href="#" class="text-decoration-none px-2 float-end icon">
+                <i class="bi bi-bookmark fs-3"></i>
+            </a>
+        </p>
+
+        <p class="m-0" id="like_count_{{ post.post.id }}">
+            <a>{{ post.post.likes }} likes</a>
+        </p>
+
+        <p>
+            <strong><a href="{% url 'web:profile' username=post.post.username %}">{{ post.post.username }}</a></strong> {{post.post.text|slice:":50"}}...
+        </p>
+        <p>
+            <a href="{% url 'web:profile' username=post.post.username %}#comments" class="link-secondary">View all {{post.post.comments_count}} comment{{post.post.comments_count|pluralize }}</a>
+        </p>
+
+        <div class="container m-0 p-0">
+        {% for comment in post.post.comments|slice:":3" %}
+
+              <div class="row">
+                <div class="col-11">
+                  <strong><a href="" class="">{{ comment.username }}</a></strong>
+                  {{comment.text|slice:":60"}}...
+                </div>
+                <div class="col p-0">
+                    <small>
+                  <a href="#" class="text-decoration-none ps-4 icon text-end">
+                    <i class="bi bi-heart fs-7"></i>
+                  </a>
+                        </small>
+                </div>
+              </div>
+        {% empty %}
+            <div></div>
+        {% endfor %}
+        </div>
+
+
+        <p class="mt-2">
+            <a href="" class="link-secondary"><small>{{ post.post.pub_date|date:'d F Y'|lower  }}</small></a>
+        </p>
+
+    </div>
+    <div class="card-footer">
+        <div class="row justify-content-start">
+            <div class="col-1 p-0 ps-2">
+                <i class="bi bi-emoji-smile fs-3"></i>
+            </div>
+            <div class="col-9 p-0">
+                                <textarea class="form-control mx-0 comment_input" id="exampleFormControlTextarea1"
+                                          rows="1"
+                                          placeholder="Add your comment..."></textarea>
+            </div>
+            <div class="col-2">
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+
+<nav>
+    <div class="text-xs-center">
+  <ul class="pagination ">
+    {% if posts.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ posts.previous_page_number }}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+        </li>
+      {% else %}
+          <li class="page-item disabled">
+              <a class="page-link "><span aria-hidden="true">&laquo;</span></a>
+            </li>
+
+    {% endif %}
+      {% if posts.number == 1 %}
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ posts.number|add:'1' }}">{{ posts.number|add:'1' }}</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ posts.number|add:'2' }}">{{ posts.number|add:'2' }}</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ posts.paginator.num_pages }}">{{ posts.paginator.num_pages }}</a></li>
+      {% endif %}
+
+      {% if posts.number != 1 and posts.number != posts.paginator.num_pages  %}
+        <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ posts.number|add:'-1' }}">{{ posts.number|add:'-1' }}</a></li>
+        <li class="page-item active"><a class="page-link" href="#">{{ posts.number }}</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ posts.number|add:'1' }}">{{ posts.number|add:'1' }}</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ posts.paginator.num_pages }}">{{ posts.paginator.num_pages }}</a></li>
+      {% endif %}
+      {% if posts.number == posts.paginator.num_pages %}
+          <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+          <li class="page-item"><a class="page-link" href="?page={{ posts.paginator.num_pages|add:'-2' }}">{{posts.paginator.num_pages|add:'-2'}}</a></li>
+          <li class="page-item"><a class="page-link" href="?page={{ posts.paginator.num_pages|add:'1' }}">{{posts.paginator.num_pages|add:'-1'}}</a></li>
+          <li class="page-item active"><a class="page-link" href="#">{{posts.paginator.num_pages}}</a></li>
+      {% endif %}
+      {% if posts.has_next %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ posts.next_page_number }}" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+      {% else %}
+      <li class="page-item disabled">
+          <a class="page-link"><span aria-hidden="true">&raquo;</span></a>
+      </li>
+      {% endif %}
+  </ul>
+    </div>
+</nav>

@@ -1,0 +1,103 @@
+{% extends "web/base.html" %}
+
+
+{% block main %}
+<div class="container py-4">
+    <div class="row justify-content-center py-2">
+        <div class="col-12 px-0">
+        <div id="post_{{ post.id }}" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false">
+            <div class="carousel-indicators">
+             {% for media in post.media.all %}
+                <button type="button" data-bs-target="#post_{{ post.id }}" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+            {% endfor %}
+            </div>
+          <div class="carousel-inner">
+              {% for media in post.media.all %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                  <img src="{{ media.media.url }} " class="d-block w-100" alt="...">
+                </div>
+              {% endfor %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#post_{{ post.id }}" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#post_{{ post.id }}" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+        </div>
+    </div>
+    <div class="row justify-content-center py-2">
+        <div class="col-8">
+            <p class="m-0">
+                <a href="#" class="text-decoration-none px-2 icon">
+                    <i class="bi bi-heart-fill fs-3"></i>
+                </a>
+
+                <a href="#" class="text-decoration-none px-2 icon">
+                    <i class="bi bi-send fs-3"></i>
+                </a>
+
+                <a href="#" class="text-decoration-none px-2 float-end icon">
+                    <i class="bi bi-bookmark fs-3"></i>
+                </a>
+            </p>
+            <p class="m-0">
+            <a href="#">6 likes</a>
+        </p>
+            <p>
+                <a href="{% url 'web:profile' username=post.user.username %}">{{ post.user.username }}</a>
+                {{post.text}}
+            </p>
+            <p>
+                {{ post.pub_date|date:'d F Y'|lower  }}
+            </p>
+        </div>
+    </div>
+    <div class="row justify-content-center py-2">
+        <div class="col-8" id="comments">
+            <a href="#comments"><h3>Comments</h3></a>
+        </div>
+    </div>
+    <div class="row justify-content-center py-2">
+        <div class="col-8">
+            {% for comment in post.comments.all %}
+
+            <div class="card mt-2" id="comment_{{ comment.id }}">
+                <div class="card-body">
+                    <a href="{% url 'web:profile' username=comment.user.username %}"><h5 class="card-title">{{ comment.user.username }}</h5></a>
+                    <p class="card-text">{{ comment.text }}</p>
+                    <a href="#" class="card-link"> <i class="bi bi-heart fs-6"></i>&nbsp;{{ comment.likes.count }}</a>
+                </div>
+            </div>
+
+
+            {% empty %}
+            <div class="card mt-2">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2">No comments</h6>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+    <div class="row justify-content-center py-2">
+        <div class="col-8">
+            <form method="post" action="{% url 'web:comment_create' post_id=post.id %}">
+                {% csrf_token %}
+                {{ comment_form.non_field_errors }}
+                  {% for field in comment_form %}
+                  <div class="mb-3">
+                    {{ field.label }}
+                    {{ field }}
+                      </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

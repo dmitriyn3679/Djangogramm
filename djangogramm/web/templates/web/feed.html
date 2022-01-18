@@ -1,0 +1,111 @@
+{% extends "web/base.html" %}
+
+
+{% block main %}
+    <div class="container pt-4">
+        <div class="row justify-content-start">
+            <div class="col-8 ps-0">
+
+
+            {% include "web/asserts/post.html" with posts=posts %}
+
+
+            </div>
+
+            <div class="col-4">
+                One of two columns
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block userlist %}
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+  <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-body">
+        <ul class="list-group list-group-flush">
+        {% for user in users %}
+            <a href="#">
+        <li class="list-group-item">{{user.username}}</li></a>
+        {% endfor %}
+            </ul>
+    </div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+
+
+    function send_request(url, data) {
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            data: JSON.stringify({payload: data}),
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRFToken": csrftoken
+            },
+            success: (data) => {
+                var post_id = data.payload.post_id;
+                var count = data.payload.count;
+                $('#like_count_' + post_id).text(count + ' likes');
+            },
+            error: (data) => {
+                console.error(data);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        $('a.like-button').on('click', function(event) {
+            event.preventDefault();
+            var container = $(this);
+            var post_id = container.attr('data-post');
+            var i = container.find('i');
+            var url = '{% url 'web:like_handler' %}';
+            var data = {};
+            console.log(post_id);
+            if (container.hasClass('liked')) {
+                console.log('unliked',post_id);
+                i.removeClass('bi-heart-fill');
+                i.addClass('bi-heart');
+                data = {action: 'unliked', post_id: post_id};
+            } else {
+                console.log('liked', post_id);
+                i.removeClass('bi-heart');
+                i.addClass('bi-heart-fill');
+                data = {action: 'liked', post_id: post_id};
+            }
+            container.toggleClass('liked');
+            send_request(url, data);
+
+        })
+    });
+</script>
+
+
+{% endblock %}
+
+        {% block userlist_show %}
+        <button type="button" class="btn btn-primary" id="liveToastBtn">Show live toast</button>
+        {% endblock %}

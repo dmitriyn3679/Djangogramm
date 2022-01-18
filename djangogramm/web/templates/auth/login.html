@@ -1,0 +1,34 @@
+{% extends "auth/base.html" %}
+
+
+{% block content %}
+
+
+<main class="form-signin">
+  <form method="post">
+    <img class="mb-4" src="/static/logo.gif" alt="" height="64" >
+    <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+    <div class="form-floating">
+
+      {{ form.username }}
+      <label for="{{ form.username.id_for_label }}">Username:</label>
+      {{ form.username.errors }}
+
+      </div>
+      <div class="form-floating">
+
+          {{ form.password }}
+          <label for="{{ form.password.id_for_label }}">Password:</label>
+          {{ form.password.errors }}
+      </div>
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+    <p class="mt-5 mb-3 text-muted text-end">
+      <a href="{% url 'web:signup' %}">Sign Up</a>
+    </p>
+    <p class="mt-5 mb-3 text-muted">&copy; 2017–2021</p>
+  </form>
+</main>
+
+{% endblock %}
